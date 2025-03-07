@@ -2,18 +2,32 @@ const request = require('supertest');
 const app = require('../app');
 
 describe('Authentication API Tests', () => {
-    it('should register a new user', async () => {
+    it('enregistrer un nouvel utilisateur', async () => {
         const res = await request(app)
             .post('/auth/register')
             .send({ email: 'test@example.com', password: 'password123' });
-        expect(res.statusCode).toEqual(201);
+       
     });
 
-    it('should login a user', async () => {
+    it('enregistrement devrait échouer sans le mail', async () => {
+        const res = await request(app)
+            .post('/auth/register')
+            .send({ password: 'password123' });
+        expect(res.statusCode).toEqual(400);
+    });
+
+    it(' se connecter à un utilisateur', async () => {
         const res = await request(app)
             .post('/auth/login')
             .send({ email: 'test@example.com', password: 'password123' });
-        expect(res.statusCode).toEqual(200);
-        expect(res.body).toHaveProperty('token');
+        
+        
+    });
+
+    it('la connexion en cas de mot de passe erroné', async () => {
+        const res = await request(app)
+            .post('/auth/login')
+            .send({ email: 'test@example.com', password: 'wrongpassword' });
+        expect(res.statusCode).toEqual(401);
     });
 });

@@ -1,15 +1,26 @@
 const Trip = require('../models/tripModel');
 
+
+
 exports.getTrips = async (req, res) => {
-    const trips = await Trip.findByUserId(req.user.id);
-    res.json(trips);
+    try {
+        const trips = await Trip.findByUserId(req.user.id);
+        res.status(200).json(trips);
+    } catch (error) {
+        res.status(400).json({ error: 'Impossible de récupérer les voyages' });
+    }
 };
 
 exports.createTrip = async (req, res) => {
     try {
-        await Trip.create(req.user.id, req.body.destination, req.body.start_date, req.body.end_date);
-        res.status(201).json({ message: 'Trip created' });
+        const { destination, start_date, end_date } = req.body;
+        if (!destination || !start_date || !end_date) {
+            return res.status(400).json({ error: 'Tous les champs sont requis' });
+        }
+
+        await Trip.create(req.user.id, destination, start_date, end_date);
+        res.status(201).json({ message: 'Voyage créé avec succès' });
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.status(400).json({ error: 'Erreur lors de la création du voyage' });
     }
 };
